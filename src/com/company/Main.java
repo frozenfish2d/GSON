@@ -1,7 +1,6 @@
 package com.company;
 
 import com.google.gson.Gson;
-import com.google.gson.internal.$Gson$Types;
 
 
 import java.io.*;
@@ -36,13 +35,12 @@ class Parser implements Runnable {
                     "action=query&list=search&utf8=&format=json&srsearch=" + search);
             InputStream jsonStream = jsonUrl.openStream();
             Reader reader = new InputStreamReader(jsonStream, "UTF-8");
-
             Gson gson = new Gson();
             WikiJSON wikiJSON = gson.fromJson(reader, WikiJSON.class);
             listener.onDownload(wikiJSON);
         } catch (IOException e) {
             listener.onError();
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
     }
@@ -81,15 +79,21 @@ public class Main {
             @Override
             public void onDownload(WikiJSON wikiJSON) {
                 List<Search> results = wikiJSON.getQuery().getSearch();
-                for (Search result : results) {
-                    System.out.println(result.getTitle());
+                for (int i = 0; i < results.size(); i++) {
+                    System.out.println(i+1 +" " +results.get(i).getTitle());
                 }
                 System.out.println();
                 System.out.println("Everything is fine ;)");
+                Scanner valueI = new Scanner(System.in);
+                System.out.print("Enter #:");
+                int ind = valueI.nextInt();
+                System.out.println("https://ru.wikipedia.org/wiki/"+results.get(ind-1).getTitle());
             }
         });
         Thread thread = new Thread(parser);
         thread.start();
+
+
 
     }
 }
