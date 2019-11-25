@@ -14,7 +14,6 @@ import java.util.Scanner;
 
 interface DownloadListener {
     void onError();
-
     void onDownload(WikiJSON wikiJSON);
 }
 
@@ -41,8 +40,8 @@ class Parser implements Runnable {
             Gson gson = new Gson();
             WikiJSON wikiJSON = gson.fromJson(reader, WikiJSON.class);
             listener.onDownload(wikiJSON);
-
         } catch (IOException e) {
+            listener.onError();
             e.printStackTrace();
         }
 
@@ -76,7 +75,7 @@ public class Main {
         parser.setListener(new DownloadListener() {
             @Override
             public void onError() {
-            System.out.println("Something wrong!");
+            System.out.println("Something wrong!!!");
             }
 
             @Override
@@ -85,6 +84,8 @@ public class Main {
                 for (Search result : results) {
                     System.out.println(result.getTitle());
                 }
+                System.out.println();
+                System.out.println("Everything is fine ;)");
             }
         });
         Thread thread = new Thread(parser);
