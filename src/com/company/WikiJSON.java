@@ -3,7 +3,7 @@ package com.company;
 
 import com.google.gson.annotations.SerializedName;
 
-public class WikiJSON implements DownloadListener{
+public class WikiJSON {
 
     @SerializedName("batchcomplete")
 
@@ -43,13 +43,4 @@ public class WikiJSON implements DownloadListener{
         this.query = query;
     }
 
-    @Override
-    public void onError() {
-        System.out.println("ERRRROOR!!!!!!!!!!!!");
-    }
-
-    @Override
-    public void onDownload() {
-        System.out.println("Downloaded");
-    }
 }

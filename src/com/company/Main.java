@@ -14,7 +14,8 @@ import java.util.Scanner;
 
 interface DownloadListener {
     void onError();
-    void onDownload();
+
+    void onDownload(WikiJSON wikiJSON);
 }
 
 class Parser implements Runnable {
@@ -32,23 +33,17 @@ class Parser implements Runnable {
     @Override
     public void run() {
         try {
-            URL jsonUrl = new URL("ht1tps://ru.wikipedia.org/w/api.php?" +
+            URL jsonUrl = new URL("https://ru.wikipedia.org/w/api.php?" +
                     "action=query&list=search&utf8=&format=json&srsearch=" + search);
             InputStream jsonStream = jsonUrl.openStream();
             Reader reader = new InputStreamReader(jsonStream, "UTF-8");
 
             Gson gson = new Gson();
             WikiJSON wikiJSON = gson.fromJson(reader, WikiJSON.class);
-            listener = wikiJSON;
-            List<Search> results = wikiJSON.getQuery().getSearch();
-            if(results.size()>0){
-                listener.onDownload();
-            }
-            for (Search result : results) {
-                System.out.println(result.getTitle());
-            }
+            listener.onDownload(wikiJSON);
+
         } catch (IOException e) {
-            listener.onError();
+            e.printStackTrace();
         }
 
     }
@@ -56,7 +51,7 @@ class Parser implements Runnable {
 
 public class Main {
 
-    public static void main(String[] args)  {
+    public static void main(String[] args) {
 
 //        try {
 //            URL url = new URL("http://school444.ru");
@@ -78,7 +73,20 @@ public class Main {
         searchString = valueS.next();
 
         Parser parser = new Parser(searchString);
-        parser.setListener(new WikiJSON());
+        parser.setListener(new DownloadListener() {
+            @Override
+            public void onError() {
+            System.out.println("Something wrong!");
+            }
+
+            @Override
+            public void onDownload(WikiJSON wikiJSON) {
+                List<Search> results = wikiJSON.getQuery().getSearch();
+                for (Search result : results) {
+                    System.out.println(result.getTitle());
+                }
+            }
+        });
         Thread thread = new Thread(parser);
         thread.start();
 
