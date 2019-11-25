@@ -14,49 +14,41 @@ import java.util.Scanner;
 
 interface DownloadListener {
     void onError();
-    void onDownload(WikiJSON wikiJSON);
+    void onDownload();
 }
 
 class Parser implements Runnable {
     private String search;
-
-
-    public DownloadListener getListener() {
-        return listener;
-    }
-
-    public void setListener(DownloadListener listener) {
-        this.listener = listener;
-    }
-
     private DownloadListener listener;
 
+    void setListener(DownloadListener listener) {
+        this.listener = listener;
+    }
 
     Parser(String s) {
         search = s;
     }
 
-
-
     @Override
     public void run() {
         try {
-            URL jsonUrl = new URL("https://ru.wikipedia.org/w/api.php?" +
+            URL jsonUrl = new URL("ht1tps://ru.wikipedia.org/w/api.php?" +
                     "action=query&list=search&utf8=&format=json&srsearch=" + search);
             InputStream jsonStream = jsonUrl.openStream();
             Reader reader = new InputStreamReader(jsonStream, "UTF-8");
+
             Gson gson = new Gson();
             WikiJSON wikiJSON = gson.fromJson(reader, WikiJSON.class);
-
+            listener = wikiJSON;
             List<Search> results = wikiJSON.getQuery().getSearch();
-            if(results !=null){
-                //listener.onDownload();
+            if(results.size()>0){
+                listener.onDownload();
             }
             for (Search result : results) {
                 System.out.println(result.getTitle());
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            listener.onError();
         }
 
     }
@@ -64,7 +56,7 @@ class Parser implements Runnable {
 
 public class Main {
 
-    public static void main(String[] args) throws UnsupportedEncodingException {
+    public static void main(String[] args)  {
 
 //        try {
 //            URL url = new URL("http://school444.ru");
@@ -84,6 +76,7 @@ public class Main {
         Scanner valueS = new Scanner(System.in);
         System.out.print("Enter string for search:");
         searchString = valueS.next();
+
         Parser parser = new Parser(searchString);
         parser.setListener(new WikiJSON());
         Thread thread = new Thread(parser);

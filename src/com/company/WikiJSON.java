@@ -45,11 +45,11 @@ public class WikiJSON implements DownloadListener{
 
     @Override
     public void onError() {
-
+        System.out.println("ERRRROOR!!!!!!!!!!!!");
     }
 
     @Override
-    public void onDownload(WikiJSON wikiJSON) {
+    public void onDownload() {
         System.out.println("Downloaded");
     }
 }
